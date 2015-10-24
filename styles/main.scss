@@ -1,0 +1,22 @@
+body{
+	font-family: "Lato"!important;
+}
+nav{
+	.navbar-default{
+		background-color: #4281A4;
+			.navbar-brand{
+				color: #E4DFDA;
+			}
+			.navbar-nav{
+				li>a{
+				color: #E4DFDA;
+				}
+				.active>a{
+					color: #E4DFDA;
+					background-color: #2c566d;
+				}
+				
+			}
+	}
+	
+}
