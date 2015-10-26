@@ -46830,6 +46830,172 @@ module.exports = React.createClass({
 			'div',
 			null,
 			React.createElement(
+				'h1',
+				null,
+				'Home'
+			)
+		);
+	}
+
+});
+
+},{"backbone":1,"react":397,"react-dom":242}],399:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Backbone = require('backbone');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	getInitialState: function getInitialState() {
+		return { error: null };
+	},
+	render: function render() {
+		var errorElement = null;
+		if (this.state.error) {
+			errorElement = React.createElement(
+				'p',
+				{ className: 'red' },
+				this.state.error
+			);
+		}
+		return React.createElement(
+			'div',
+			{ className: 'col-md-6 col-md-offset-3 box-shadow--8dp formBlock' },
+			React.createElement(
+				'form',
+				{ onSubmit: this.onLogin, className: 'form-horizontal' },
+				React.createElement(
+					'div',
+					{ className: 'form-group' },
+					React.createElement(
+						'label',
+						{ htmlFor: 'inputEmail3', className: 'col-sm-2 control-label' },
+						'Email'
+					),
+					React.createElement(
+						'div',
+						{ className: 'col-sm-10' },
+						React.createElement('input', { type: 'text', ref: 'email', className: 'form-control', id: 'inputEmail3', placeholder: 'Username' })
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'form-group' },
+					React.createElement(
+						'label',
+						{ htmlFor: 'inputPassword3', className: 'col-sm-2 control-label' },
+						'Password'
+					),
+					React.createElement(
+						'div',
+						{ className: 'col-sm-10' },
+						React.createElement('input', { type: 'password', ref: 'password', className: 'form-control', id: 'inputPassword3', placeholder: 'Password' })
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'form-group' },
+					React.createElement(
+						'div',
+						{ className: 'col-sm-offset-2 col-sm-10' },
+						React.createElement(
+							'button',
+							{ type: 'submit', className: 'btn btn-default' },
+							'Sign in'
+						)
+					)
+				)
+			)
+		);
+	},
+	onLogin: function onLogin(e) {
+		var _this = this;
+
+		e.preventDefault();
+		Parse.User.logIn(this.refs.email.value, this.refs.password.value, {
+			success: function success(u) {
+				console.log('success');
+				_this.props.router.navigate('', { trigger: true });
+				_this.props.router.trigger('login');
+			},
+			error: function error(u, _error) {
+				console.log('error');
+				_this.setState({
+					error: _error.message
+				});
+			}
+		});
+	}
+
+});
+
+},{"backbone":1,"react":397,"react-dom":242}],400:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Backbone = require('backbone');
+var StudentModel = require('../models/StudentModel');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	getInitialState: function getInitialState() {
+		return {
+			allStudents: []
+		};
+	},
+	componentWillMount: function componentWillMount() {
+		var _this = this;
+
+		this.fetchStudents();
+		this.props.router.on('route', function () {
+			_this.forceUpdate();
+		});
+
+		this.props.router.on('login', function () {
+			_this.fetchStudents();
+		});
+	},
+	render: function render() {
+		var currentUser = Parse.User.current();
+		var Links = [];
+
+		if (!currentUser) {
+			Links.push(this.createNavLink('login', 'Login'));
+		} else {
+
+			// for loop over students, the push to Links get first name
+			this.state.allStudents.map(function (a) {
+				Links.push(React.createElement(
+					'li',
+					null,
+					React.createElement(
+						'a',
+						{ href: '#' },
+						a.get('firstName')
+					)
+				));
+			});
+
+			Links.push(React.createElement(
+				'li',
+				null,
+				React.createElement(
+					'a',
+					{ href: '#', onClick: this.onLogout },
+					'Logout'
+				)
+			));
+		}
+
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
 				'nav',
 				{ className: 'navbar navbar-default' },
 				React.createElement(
@@ -46853,7 +47019,7 @@ module.exports = React.createClass({
 						React.createElement(
 							'a',
 							{ className: 'navbar-brand', href: '#' },
-							'Brand'
+							'youngStar'
 						)
 					),
 					React.createElement(
@@ -46861,53 +47027,81 @@ module.exports = React.createClass({
 						{ className: 'collapse navbar-collapse', id: 'bs-example-navbar-collapse-1' },
 						React.createElement(
 							'ul',
-							{ className: 'nav navbar-nav' },
-							React.createElement(
-								'li',
-								{ className: 'active' },
-								React.createElement(
-									'a',
-									{ href: '#' },
-									'Link ',
-									React.createElement(
-										'span',
-										{ className: 'sr-only' },
-										'(current)'
-									)
-								)
-							),
-							React.createElement(
-								'li',
-								null,
-								React.createElement(
-									'a',
-									{ href: '#' },
-									'Link'
-								)
-							)
-						),
-						React.createElement(
-							'ul',
 							{ className: 'nav navbar-nav navbar-right' },
-							React.createElement(
-								'li',
-								null,
-								React.createElement(
-									'a',
-									{ href: '#' },
-									'Link'
-								)
-							)
+							Links
 						)
 					)
 				)
+			)
+		);
+	},
+	onLogout: function onLogout(e) {
+		e.preventDefault();
+		Parse.User.logOut();
+		this.props.router.navigate('register', { trigger: true });
+	},
+	createNavLink: function createNavLink(url, label) {
+		var currentUrl = Backbone.history.getFragment();
+		if (currentUrl === url) {
+			return React.createElement(
+				'li',
+				{ className: 'active' },
+				React.createElement(
+					'a',
+					{ href: '#' + url },
+					label
+				)
+			);
+		} else {
+			return React.createElement(
+				'li',
+				null,
+				React.createElement(
+					'a',
+					{ href: '#' + url },
+					label
+				)
+			);
+		}
+	},
+	fetchStudents: function fetchStudents() {
+		var _this2 = this;
+
+		//finding the children assoicated with the logged in parent
+		var query = new Parse.Query(StudentModel);
+		query.equalTo('parent', Parse.User.current());
+		query.find().then(function (students) {
+			_this2.setState({ allStudents: students });
+		});
+	}
+
+});
+
+},{"../models/StudentModel":403,"backbone":1,"react":397,"react-dom":242}],401:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Backbone = require('backbone');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	render: function render() {
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'h1',
+				null,
+				'Register'
 			)
 		);
 	}
 
 });
 
-},{"backbone":1,"react":397,"react-dom":242}],399:[function(require,module,exports){
+},{"backbone":1,"react":397,"react-dom":242}],402:[function(require,module,exports){
 'use strict';
 var React = require('react');
 var ReactDOM = require('react-dom');
@@ -46915,18 +47109,48 @@ var Backbone = require('backbone');
 window.$ = require('jquery');
 window.jQuery = $;
 require('react-bootstrap');
-
+var app = document.getElementById('app');
 var NavigationComponent = require('./components/NavigationComponent');
+var LoginComponent = require('./components/LoginComponent');
+var HomeComponent = require('./components/HomeComponent');
+var RegisterComponent = require('./components/RegisterComponent');
+var StudentModel = require('./models/StudentModel');
 
 Parse.initialize('s8ymxzLxffDiYnjpMiXv6WMSebgMvt3FFwWoiBNK', 'zI8sNxFoFKso2OgRpwXiviI9qmuP3vu4x9X0vRDG');
 
-var Router = Backbone.Router.extend({});
+var Router = Backbone.Router.extend({
+	routes: {
+		'': 'home',
+		'login': 'login',
+		'register': 'register'
+	},
+	home: function home() {
+		ReactDOM.render(React.createElement(HomeComponent, null), app);
+	},
+	register: function register() {
+		ReactDOM.render(React.createElement(RegisterComponent, { router: r }), app);
+	},
+	login: function login() {
+		if (Parse.User.current()) {
+			this.navigate('', { trigger: true });
+		} else {
+			ReactDOM.render(React.createElement(LoginComponent, { router: r }), app);
+		}
+	}
+});
 var r = new Router();
 Backbone.history.start();
 
 ReactDOM.render(React.createElement(NavigationComponent, { router: r }), document.getElementById('nav'));
 
-},{"./components/NavigationComponent":398,"backbone":1,"jquery":4,"react":397,"react-bootstrap":75,"react-dom":242}]},{},[399])
+},{"./components/HomeComponent":398,"./components/LoginComponent":399,"./components/NavigationComponent":400,"./components/RegisterComponent":401,"./models/StudentModel":403,"backbone":1,"jquery":4,"react":397,"react-bootstrap":75,"react-dom":242}],403:[function(require,module,exports){
+'use strict';
+
+module.exports = Parse.Object.extend({
+	className: 'StudentModel'
+});
+
+},{}]},{},[402])
 
 
 //# sourceMappingURL=bundle.js.map

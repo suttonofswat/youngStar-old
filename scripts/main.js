@@ -5,8 +5,12 @@ var Backbone = require('backbone');
 window.$ = require('jquery');
 window.jQuery = $;
 require('react-bootstrap');
-
+var app = document.getElementById('app');
 var NavigationComponent = require('./components/NavigationComponent');
+var LoginComponent = require('./components/LoginComponent');
+var HomeComponent = require('./components/HomeComponent');
+var RegisterComponent = require('./components/RegisterComponent');
+var StudentModel = require('./models/StudentModel');
 
 Parse.initialize(
 	's8ymxzLxffDiYnjpMiXv6WMSebgMvt3FFwWoiBNK',
@@ -14,8 +18,29 @@ Parse.initialize(
 );
 
 var Router = Backbone.Router.extend({
-
-});
+	routes: {
+		'' : 'home',
+		'login' : 'login',
+		'register': 'register'
+	},
+	home: function() {
+		ReactDOM.render(<HomeComponent />, app);
+	},
+	register: function() {
+		ReactDOM.render(<RegisterComponent router={r} />, app);
+	},
+	login: function() {
+		if(Parse.User.current()) {
+			this.navigate('', {trigger: true});
+		}
+		else {
+			ReactDOM.render(
+				<LoginComponent router={r} />,
+				app
+			);
+		}
+	}
+})
 var r = new Router();
 Backbone.history.start();
 
