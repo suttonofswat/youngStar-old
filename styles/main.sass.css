@@ -19,16 +19,3 @@
 
 body {
   font-family: "Lato" !important; }
-
-nav .navbar-default {
-  background-color: #4281A4; }
-  nav .navbar-default .navbar-brand {
-    color: #E4DFDA; }
-  nav .navbar-default .navbar-nav li > a {
-    color: #E4DFDA; }
-  nav .navbar-default .navbar-nav .active > a {
-    color: #E4DFDA;
-    background-color: #2c566d; }
-
-.formBlock {
-  padding: 3em; }

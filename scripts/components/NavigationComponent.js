@@ -3,6 +3,7 @@ var ReactDOM = require('react-dom');
 var Backbone = require('backbone');
 var StudentModel = require('../models/StudentModel');
 
+
 module.exports = React.createClass({
 	getInitialState: function(){
 		return{
@@ -25,6 +26,7 @@ module.exports = React.createClass({
 	render: function(){
 		var currentUser = Parse.User.current();
 		var Links = [];
+		var BtnLinks = [];
 
 		if(!currentUser){
 			Links.push(this.createNavLink('login', 'Login'));
@@ -32,12 +34,12 @@ module.exports = React.createClass({
 		else {
 
 			// for loop over students, the push to Links get first name
-				this.state.allStudents.map(function(a){
-					Links.push(<li><a href='#'>{a.get('firstName')}</a></li>);
+				this.state.allStudents.map((a) => {
+					BtnLinks.push(<li key={a.id}><button className="navBtn"><a href={'#pointBoard/'+a.id}>{a.get('firstName')}s Board</a></button></li>);
 
 				})
 			
-			Links.push(<li><a href='#' onClick={this.onLogout}>Logout</a></li>);
+			Links.push(<li key={'logout'}><button className="logoutBtn"><a href='#' onClick={this.onLogout}>Logout</a></button></li>);
 		}
 
 		return (
@@ -58,6 +60,7 @@ module.exports = React.createClass({
 
 						<div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 							<ul className="nav navbar-nav navbar-right">
+								{BtnLinks}
 								{Links}
 							</ul>
 						</div>
@@ -74,10 +77,10 @@ module.exports = React.createClass({
 	createNavLink: function(url, label) {
 		var currentUrl = Backbone.history.getFragment();
 		if(currentUrl === url){
-			return (<li className="active"><a href={'#'+url}>{label}</a></li>);
+			return (<li key={url}className="active"><a href={'#'+url}>{label}</a></li>);
 		}
 		else{
-			return(<li><a href={'#'+url}>{label}</a></li>);
+			return(<li key={url}><a href={'#'+url}>{label}</a></li>);
 		}
 	},
 	fetchStudents: function(){
