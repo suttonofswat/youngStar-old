@@ -34079,6 +34079,152 @@ module.exports = require('./lib/React');
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Backbone = require('backbone');
+var _ = require('backbone/node_modules/underscore');
+var AssignmentModel = require('../models/AssignmentModel');
+var StudentModel = require('../models/StudentModel');
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	getInitialState: function getInitialState() {
+		return {
+			subject: [],
+			student: null
+		};
+	},
+	componentWillMount: function componentWillMount() {
+		var _this = this;
+
+		var child = this.props.studentId;
+		var targetStudentModel = new StudentModel({ objectId: child });
+
+		var query = new Parse.Query(AssignmentModel);
+		query.equalTo('child', targetStudentModel).equalTo('subjectName', this.props.subject).find().then(function (subject) {
+			var newQuery = new Parse.Query(StudentModel);
+			newQuery.get(_this.props.studentId).then(function (student) {
+				_this.setState({ student: student, subject: subject });
+			}, function (err) {
+				console.log(err);
+			});
+		}, function (err) {
+			console.log(err);
+		});
+	},
+
+	render: function render() {
+
+		var subjectAssignment = this.state.subject.map(function (assignment) {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement('hr', null),
+				React.createElement(
+					'h5',
+					null,
+					assignment.get('assignmentName')
+				),
+				React.createElement(
+					'div',
+					null,
+					assignment.get('createdAt').toDateString()
+				),
+				React.createElement(
+					'div',
+					null,
+					assignment.get('assignmentGrade')
+				),
+				React.createElement(
+					'div',
+					null,
+					assignment.get('assignmentPoints')
+				),
+				React.createElement(
+					'div',
+					null,
+					assignment.get('assignmentType')
+				),
+				React.createElement(
+					'div',
+					null,
+					assignment.get('assignmentNotes')
+				)
+			);
+		});
+		if (!this.state.student || !this.state.subject) {
+			return React.createElement(
+				'div',
+				null,
+				'Loading..'
+			);
+		} else {
+
+			// totalPoints.push(this.state.subject.get('assignmentPoints'));
+			// var totalPoints = this.state.subject.get('assignmentPoints');
+			console.log(this.state.subject);
+			var myArray = [];
+			this.state.subject.forEach(function (index) {
+				myArray.push(index.get('assignmentPoints'));
+			});
+			var totalNumbers = 0;
+			myArray.length > 0 ? totalNumbers = myArray.reduce(function (a, b) {
+				return a + b;
+			}) : '';
+			var averageNum = totalNumbers / myArray.length;
+
+			var avgGrade = '';
+			if (averageNum === -10) {
+				avgGrade = 'F';
+				console.log(avgGrade);
+			} else if (averageNum === -5) {
+				avgGrade = 'D';
+				console.log(avgGrade);
+			} else if (averageNum === 0) {
+				avgGrade = 'C';
+				console.log(avgGrade);
+			} else if (averageNum === 5) {
+				avgGrade = 'B';
+				console.log(avgGrade);
+			} else if (averageNum === 10) {
+				avgGrade = 'A';
+				console.log(avgGrade);
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'h1',
+					null,
+					this.state.student.get('firstName'),
+					's ',
+					this.props.subject,
+					' Assignments'
+				),
+				React.createElement(
+					'div',
+					null,
+					'Average ',
+					this.props.subject,
+					' Grade: ',
+					avgGrade
+				),
+				React.createElement(
+					'div',
+					null,
+					'Total Points to date: ',
+					totalNumbers
+				),
+				subjectAssignment
+			);
+		}
+	}
+});
+
+},{"../models/AssignmentModel":182,"../models/StudentModel":183,"backbone":1,"backbone/node_modules/underscore":2,"react":173,"react-dom":18}],175:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Backbone = require('backbone');
 var StudentModel = require('../models/StudentModel');
 var AssignmentModel = require('../models/AssignmentModel');
 require('bootstrap');
@@ -34121,19 +34267,21 @@ module.exports = React.createClass({
 									React.createElement(
 										'h3',
 										null,
-										this.props.subject
+										'Add New ',
+										this.props.subject,
+										' Grade'
 									),
 									React.createElement('input', { type: 'text', ref: 'assignmentName', className: 'form-control', placeholder: 'Assignment Name' }),
 									React.createElement(
 										'div',
-										{ className: 'form-group' },
+										{ className: 'form-group', id: 'dropdown' },
 										React.createElement(
 											'select',
 											{ ref: 'assignmentType', className: 'form-control' },
 											React.createElement(
 												'option',
-												{ disabled: 'disabled' },
-												'Select'
+												{ disabled: true, selected: true },
+												'Assignment Type'
 											),
 											React.createElement(
 												'option',
@@ -34153,6 +34301,7 @@ module.exports = React.createClass({
 										)
 									),
 									React.createElement('input', { type: 'text', ref: 'grade', className: 'form-control', placeholder: 'Grade' }),
+									React.createElement('textarea', { className: 'form-control', ref: 'notes', rows: '3', placeholder: 'Notes' }),
 									React.createElement(
 										'button',
 										null,
@@ -34161,6 +34310,11 @@ module.exports = React.createClass({
 								)
 							)
 						)
+					),
+					React.createElement(
+						'a',
+						{ href: '#assignmentDetails/' + this.props.student.id + '/' + this.props.subject },
+						'all assignments'
 					)
 				)
 			)
@@ -34172,6 +34326,7 @@ module.exports = React.createClass({
 		this.refs.grade.value = '';
 	},
 	onAddAssignment: function onAddAssignment(e) {
+		console.log(this.props);
 		e.preventDefault();
 		var gradePts = 0;
 		if (this.refs.grade.value.toUpperCase() === 'A') {
@@ -34192,22 +34347,29 @@ module.exports = React.createClass({
 		} else {
 			console.log('please enter in a grade a-f');
 		}
-		var child = this.props.studentId;
-		var targetStudentModel = new StudentModel({ objectId: child });
+
 		var newAssignment = new AssignmentModel({
+			assignmentName: this.refs.assignmentName.value,
+			assignmentNotes: this.refs.notes.value,
 			assignmentType: this.refs.assignmentType.value,
-			child: targetStudentModel,
+			child: this.props.student,
 			assignmentGrade: this.refs.grade.value,
-			assignmentPoints: parseFloat(gradePts)
+			assignmentPoints: parseFloat(gradePts),
+			subjectName: this.props.subject
+
 		});
 		newAssignment.save();
 
 		$(this.refs.classBox).modal('hide');
+		this.props.dispatcher.trigger('assignmentSubmit');
+
+		var totalPoints = this.props.student.get('points') + gradePts;
+		this.props.student.save({ points: totalPoints });
 	}
 
 });
 
-},{"../models/AssignmentModel":181,"../models/StudentModel":182,"backbone":1,"bootstrap":3,"react":173,"react-dom":18}],175:[function(require,module,exports){
+},{"../models/AssignmentModel":182,"../models/StudentModel":183,"backbone":1,"bootstrap":3,"react":173,"react-dom":18}],176:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34231,7 +34393,7 @@ module.exports = React.createClass({
 
 });
 
-},{"backbone":1,"react":173,"react-dom":18}],176:[function(require,module,exports){
+},{"backbone":1,"react":173,"react-dom":18}],177:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34324,7 +34486,7 @@ module.exports = React.createClass({
 
 });
 
-},{"backbone":1,"react":173,"react-dom":18}],177:[function(require,module,exports){
+},{"backbone":1,"react":173,"react-dom":18}],178:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34480,12 +34642,13 @@ module.exports = React.createClass({
 
 });
 
-},{"../models/StudentModel":182,"backbone":1,"react":173,"react-dom":18}],178:[function(require,module,exports){
+},{"../models/StudentModel":183,"backbone":1,"react":173,"react-dom":18}],179:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Backbone = require('backbone');
+var _ = require('backbone/node_modules/underscore');
 var StudentModel = require('../models/StudentModel');
 var ClassBoxComponent = require('./ClassBoxComponent');
 
@@ -34494,56 +34657,71 @@ module.exports = React.createClass({
 
 	getInitialState: function getInitialState() {
 		return {
-			student: []
+			student: null
 		};
 	},
 	componentWillMount: function componentWillMount() {
 		var _this = this;
 
+		this.dispatcher = {};
+		_.extend(this.dispatcher, Backbone.Events);
+		this.dispatcher.on('assignmentSubmit', function () {
+			_this.forceUpdate();
+		});
 		this.props.router.on('route', function () {
 			_this.fetchBoard();
 		});
 		this.fetchBoard();
 	},
 	render: function render() {
-		var content = this.state.student.map(function (child) {
+		if (!this.state.student) {
 			return React.createElement(
 				'div',
-				{ key: 'childinfo' },
-				React.createElement(
-					'h1',
-					null,
-					child.get('firstName'),
-					' Star Board'
-				),
+				null,
+				'Loading..'
+			);
+		} else {
+			console.log(this.state.student);
+			return React.createElement(
+				'div',
+				null,
 				React.createElement(
 					'div',
 					null,
-					'Current Points ',
-					child.get('points')
+					React.createElement(
+						'h2',
+						{ className: 'col-md-8' },
+						this.state.student.get('firstName'),
+						's Star Board'
+					),
+					React.createElement(
+						'h3',
+						{ className: 'col-md-4' },
+						React.createElement(
+							'span',
+							{ className: 'currentPts' },
+							'Current Points: ',
+							this.state.student.get('points')
+						)
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row col-md-8', id: 'subjectBoxes' },
+					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Math' }),
+					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Science' }),
+					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Reading' }),
+					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Social Studies' })
 				)
 			);
-		});
-		return React.createElement(
-			'div',
-			null,
-			content,
-			React.createElement(
-				'div',
-				{ className: 'row' },
-				React.createElement(ClassBoxComponent, { studentId: this.props.studentId, subject: 'Math' }),
-				React.createElement(ClassBoxComponent, { studentId: this.props.studentId, subject: 'Science' }),
-				React.createElement(ClassBoxComponent, { studentId: this.props.studentId, subject: 'Reading' }),
-				React.createElement(ClassBoxComponent, { studentId: this.props.studentId, subject: 'Social Studies' })
-			)
-		);
+		}
 	},
 	fetchBoard: function fetchBoard() {
 		var _this2 = this;
 
-		//set loading
 		var query = new Parse.Query(StudentModel);
-		query.equalTo('objectId', this.props.studentId).find().then(function (student) {
+		query.get(this.props.studentId).then(function (student) {
+			console.log('got student', student);
 			_this2.setState({ student: student });
 		}, function (err) {
 			console.log(err);
@@ -34552,7 +34730,7 @@ module.exports = React.createClass({
 
 });
 
-},{"../models/StudentModel":182,"./ClassBoxComponent":174,"backbone":1,"react":173,"react-dom":18}],179:[function(require,module,exports){
+},{"../models/StudentModel":183,"./ClassBoxComponent":175,"backbone":1,"backbone/node_modules/underscore":2,"react":173,"react-dom":18}],180:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34576,7 +34754,7 @@ module.exports = React.createClass({
 
 });
 
-},{"backbone":1,"react":173,"react-dom":18}],180:[function(require,module,exports){
+},{"backbone":1,"react":173,"react-dom":18}],181:[function(require,module,exports){
 'use strict';
 var React = require('react');
 var ReactDOM = require('react-dom');
@@ -34592,7 +34770,7 @@ var HomeComponent = require('./components/HomeComponent');
 var RegisterComponent = require('./components/RegisterComponent');
 // var StudentModel = require('./models/StudentModel');
 var PointBoardComponent = require('./components/PointBoardComponent');
-var ClassBoxComponent = require('./components/ClassBoxComponent');
+var AssignmentDetailsComponent = require('./components/AssignmentDetailComponent');
 
 Parse.initialize('s8ymxzLxffDiYnjpMiXv6WMSebgMvt3FFwWoiBNK', 'zI8sNxFoFKso2OgRpwXiviI9qmuP3vu4x9X0vRDG');
 
@@ -34601,7 +34779,8 @@ var Router = Backbone.Router.extend({
 		'': 'home',
 		'login': 'login',
 		'register': 'register',
-		'pointBoard/:id': 'pointBoard'
+		'pointBoard/:id': 'pointBoard',
+		'assignmentDetails/:id/:subject': 'assignmentDetails'
 	},
 	home: function home() {
 		ReactDOM.render(React.createElement(HomeComponent, null), app);
@@ -34611,6 +34790,9 @@ var Router = Backbone.Router.extend({
 	},
 	pointBoard: function pointBoard(id) {
 		ReactDOM.render(React.createElement(PointBoardComponent, { studentId: id, router: r }), app);
+	},
+	assignmentDetails: function assignmentDetails(id, subject) {
+		ReactDOM.render(React.createElement(AssignmentDetailsComponent, { studentId: id, router: r, subject: subject }), app);
 	},
 	login: function login() {
 		if (Parse.User.current()) {
@@ -34625,21 +34807,21 @@ Backbone.history.start();
 
 ReactDOM.render(React.createElement(NavigationComponent, { router: r }), document.getElementById('nav'));
 
-},{"./components/ClassBoxComponent":174,"./components/HomeComponent":175,"./components/LoginComponent":176,"./components/NavigationComponent":177,"./components/PointBoardComponent":178,"./components/RegisterComponent":179,"backbone":1,"bootstrap":3,"jquery":17,"react":173,"react-dom":18}],181:[function(require,module,exports){
+},{"./components/AssignmentDetailComponent":174,"./components/HomeComponent":176,"./components/LoginComponent":177,"./components/NavigationComponent":178,"./components/PointBoardComponent":179,"./components/RegisterComponent":180,"backbone":1,"bootstrap":3,"jquery":17,"react":173,"react-dom":18}],182:[function(require,module,exports){
 'use strict';
 
 module.exports = Parse.Object.extend({
 	className: 'AssignmentModel'
 });
 
-},{}],182:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 'use strict';
 
 module.exports = Parse.Object.extend({
 	className: 'StudentModel'
 });
 
-},{}]},{},[180])
+},{}]},{},[181])
 
 
 //# sourceMappingURL=bundle.js.map

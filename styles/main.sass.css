@@ -19,3 +19,27 @@
 
 body {
   font-family: "Lato" !important; }
+
+.formBlock {
+  padding: 3em; }
+
+.form-control {
+  margin-bottom: 1em; }
+
+#subjectBoxes {
+  margin-top: 2em; }
+
+#dropdown {
+  margin-right: 0;
+  margin-left: 0;
+  margin-bottom: 0; }
+
+.currentPts {
+  border: 1px solid black;
+  padding: 1em 4em; }
+
+.modal-content {
+  padding: 3em; }
+
+textarea {
+  width: 100%; }

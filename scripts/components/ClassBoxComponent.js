@@ -6,6 +6,7 @@ var AssignmentModel = require('../models/AssignmentModel');
 require('bootstrap');
 
 module.exports = React.createClass({
+
 	render: function(){
 		return (
 				<div className="col-xs-6 col-sm-3 col-md-4">
@@ -18,22 +19,24 @@ module.exports = React.createClass({
 								<div className="modal-dialog modal-lg">
 									<div className="modal-content">
 										<form className="form-horizontal" onSubmit={this.onAddAssignment}>
-											<h3>{this.props.subject}</h3>
+											<h3>Add New {this.props.subject} Grade</h3>
 											<input type="text" ref="assignmentName" className="form-control" placeholder="Assignment Name" />
-											<div className="form-group">
+											<div className="form-group" id="dropdown">
 	  												<select ref="assignmentType" className="form-control">
-														<option disabled="disabled">Select</option>
+														<option disabled selected>Assignment Type</option>
 														<option>Homework</option>
 														<option>Project</option>
 														<option>Test</option>
 													</select>
 											</div>
 											<input type="text" ref="grade" className="form-control" placeholder="Grade" />
+											<textarea className="form-control" ref="notes" rows="3" placeholder="Notes"></textarea>
 											<button>Add Assignment</button>
 										</form>
 									</div>
 								</div>
 							</div>
+							<a href={`#assignmentDetails/${this.props.student.id}/${this.props.subject}`}>all assignments</a>
 						</div>
 					</div>
 				</div>
@@ -48,6 +51,7 @@ module.exports = React.createClass({
 		
 	},
 	onAddAssignment: function(e){
+		console.log(this.props);
 		e.preventDefault();
 		var gradePts = 0;
 		if(this.refs.grade.value.toUpperCase() === 'A'){
@@ -68,17 +72,26 @@ module.exports = React.createClass({
 		}else{
 			console.log('please enter in a grade a-f');
 		}
-		var child =this.props.studentId;
-		var targetStudentModel = new StudentModel({objectId: child});
+
 		var newAssignment = new AssignmentModel({
+			assignmentName: this.refs.assignmentName.value,
+			assignmentNotes: this.refs.notes.value,
 			assignmentType: this.refs.assignmentType.value,
-			child: targetStudentModel,
+			child: this.props.student,
 			assignmentGrade: this.refs.grade.value,
-			assignmentPoints: parseFloat(gradePts)
+			assignmentPoints: parseFloat(gradePts),
+			subjectName: this.props.subject
+
 		})
 		newAssignment.save();
 
 		$(this.refs.classBox).modal('hide');
+		this.props.dispatcher.trigger('assignmentSubmit');
+
+		var totalPoints = this.props.student.get('points') + gradePts;
+		this.props.student.save({points: totalPoints});
 	}
+	
+	
 	
 })

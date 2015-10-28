@@ -13,7 +13,7 @@ var HomeComponent = require('./components/HomeComponent');
 var RegisterComponent = require('./components/RegisterComponent');
 // var StudentModel = require('./models/StudentModel');
 var PointBoardComponent = require('./components/PointBoardComponent');
-var ClassBoxComponent = require('./components/ClassBoxComponent');
+var AssignmentDetailsComponent = require('./components/AssignmentDetailComponent');
 
 Parse.initialize(
 	's8ymxzLxffDiYnjpMiXv6WMSebgMvt3FFwWoiBNK',
@@ -25,7 +25,8 @@ var Router = Backbone.Router.extend({
 		'' : 'home',
 		'login' : 'login',
 		'register': 'register',
-		'pointBoard/:id': 'pointBoard'
+		'pointBoard/:id': 'pointBoard',
+		'assignmentDetails/:id/:subject': 'assignmentDetails'
 	},
 	home: function() {
 		ReactDOM.render(<HomeComponent />, app);
@@ -36,6 +37,12 @@ var Router = Backbone.Router.extend({
 	pointBoard: function(id) {
 		ReactDOM.render(
 			<PointBoardComponent studentId={id} router={r} />,
+			app
+		);
+	},
+	assignmentDetails: function(id, subject) {
+		ReactDOM.render(
+			<AssignmentDetailsComponent studentId={id} router={r} subject={subject}/>,
 			app
 		);
 	},
