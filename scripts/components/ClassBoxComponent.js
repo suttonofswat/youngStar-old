@@ -6,7 +6,7 @@ var AssignmentModel = require('../models/AssignmentModel');
 require('bootstrap');
 
 module.exports = React.createClass({
-
+	//class box with modal and form
 	render: function(){
 		return (
 				<div className="col-xs-6 col-sm-3 col-md-4">
@@ -51,6 +51,7 @@ module.exports = React.createClass({
 		
 	},
 	onAddAssignment: function(e){
+	//creating points based on the grade given
 		console.log(this.props);
 		e.preventDefault();
 		var gradePts = 0;
@@ -72,7 +73,7 @@ module.exports = React.createClass({
 		}else{
 			console.log('please enter in a grade a-f');
 		}
-
+	//on submit, having the form save the new assignment model to the server
 		var newAssignment = new AssignmentModel({
 			assignmentName: this.refs.assignmentName.value,
 			assignmentNotes: this.refs.notes.value,
@@ -87,7 +88,7 @@ module.exports = React.createClass({
 
 		$(this.refs.classBox).modal('hide');
 		this.props.dispatcher.trigger('assignmentSubmit');
-
+	//having the points also saved to the student model's total points
 		var totalPoints = this.props.student.get('points') + gradePts;
 		this.props.student.save({points: totalPoints});
 	}

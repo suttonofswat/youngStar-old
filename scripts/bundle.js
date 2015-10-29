@@ -34094,6 +34094,7 @@ module.exports = React.createClass({
 	componentWillMount: function componentWillMount() {
 		var _this = this;
 
+		//setting the child and subject to the state.
 		var child = this.props.studentId;
 		var targetStudentModel = new StudentModel({ objectId: child });
 
@@ -34111,7 +34112,7 @@ module.exports = React.createClass({
 	},
 
 	render: function render() {
-
+		//mapping through the subject to return the detailed information about that students subject
 		var subjectAssignment = this.state.subject.map(function (assignment) {
 			return React.createElement(
 				'div',
@@ -34149,6 +34150,7 @@ module.exports = React.createClass({
 				)
 			);
 		});
+		//checking to make sure the student and subject has loaded.
 		if (!this.state.student || !this.state.subject) {
 			return React.createElement(
 				'div',
@@ -34156,10 +34158,7 @@ module.exports = React.createClass({
 				'Loading..'
 			);
 		} else {
-
-			// totalPoints.push(this.state.subject.get('assignmentPoints'));
-			// var totalPoints = this.state.subject.get('assignmentPoints');
-			console.log(this.state.subject);
+			//getting the sum of all of the grade points, then getting the average grade for that subject.
 			var myArray = [];
 			this.state.subject.forEach(function (index) {
 				myArray.push(index.get('assignmentPoints'));
@@ -34187,7 +34186,6 @@ module.exports = React.createClass({
 				avgGrade = 'A';
 				console.log(avgGrade);
 			}
-
 			return React.createElement(
 				'div',
 				null,
@@ -34219,7 +34217,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/AssignmentModel":182,"../models/StudentModel":183,"backbone":1,"backbone/node_modules/underscore":2,"react":173,"react-dom":18}],175:[function(require,module,exports){
+},{"../models/AssignmentModel":183,"../models/StudentModel":184,"backbone":1,"backbone/node_modules/underscore":2,"react":173,"react-dom":18}],175:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34232,6 +34230,7 @@ require('bootstrap');
 module.exports = React.createClass({
 	displayName: 'exports',
 
+	//class box with modal and form
 	render: function render() {
 		return React.createElement(
 			'div',
@@ -34326,6 +34325,7 @@ module.exports = React.createClass({
 		this.refs.grade.value = '';
 	},
 	onAddAssignment: function onAddAssignment(e) {
+		//creating points based on the grade given
 		console.log(this.props);
 		e.preventDefault();
 		var gradePts = 0;
@@ -34347,7 +34347,7 @@ module.exports = React.createClass({
 		} else {
 			console.log('please enter in a grade a-f');
 		}
-
+		//on submit, having the form save the new assignment model to the server
 		var newAssignment = new AssignmentModel({
 			assignmentName: this.refs.assignmentName.value,
 			assignmentNotes: this.refs.notes.value,
@@ -34362,19 +34362,20 @@ module.exports = React.createClass({
 
 		$(this.refs.classBox).modal('hide');
 		this.props.dispatcher.trigger('assignmentSubmit');
-
+		//having the points also saved to the student model's total points
 		var totalPoints = this.props.student.get('points') + gradePts;
 		this.props.student.save({ points: totalPoints });
 	}
 
 });
 
-},{"../models/AssignmentModel":182,"../models/StudentModel":183,"backbone":1,"bootstrap":3,"react":173,"react-dom":18}],176:[function(require,module,exports){
+},{"../models/AssignmentModel":183,"../models/StudentModel":184,"backbone":1,"bootstrap":3,"react":173,"react-dom":18}],176:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Backbone = require('backbone');
+var StudentModel = require('../models/StudentModel');
 
 module.exports = React.createClass({
 	displayName: 'exports',
@@ -34387,13 +34388,48 @@ module.exports = React.createClass({
 				'h1',
 				null,
 				'Home'
+			),
+			React.createElement(
+				'form',
+				{ onSubmit: this.onAddChild },
+				React.createElement(
+					'div',
+					{ className: 'form-group' },
+					React.createElement(
+						'label',
+						{ className: 'col-sm-2 control-label' },
+						'Childs First Name:'
+					),
+					React.createElement(
+						'div',
+						{ className: 'col-sm-10' },
+						React.createElement('input', { type: 'text', ref: 'firstName', className: 'form-control', id: 'inputEmail3' })
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'button',
+						null,
+						'Add youngStar'
+					)
+				)
 			)
 		);
+	},
+	onAddChild: function onAddChild() {
+		var newChild = new StudentModel({
+			firstName: this.refs.firstName.value,
+			parent: Parse.User.current(),
+			points: 0
+		});
+		newChild.save();
 	}
 
 });
 
-},{"backbone":1,"react":173,"react-dom":18}],177:[function(require,module,exports){
+},{"../models/StudentModel":184,"backbone":1,"react":173,"react-dom":18}],177:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34502,6 +34538,7 @@ module.exports = React.createClass({
 			allStudents: []
 		};
 	},
+	//on load, fetching the students from parse and forcing the nav to update with that info.
 	componentWillMount: function componentWillMount() {
 		var _this = this;
 
@@ -34512,31 +34549,28 @@ module.exports = React.createClass({
 
 		this.props.router.on('login', function () {
 			_this.fetchStudents();
+			console.log('test');
 		});
 	},
 	render: function render() {
 		var currentUser = Parse.User.current();
 		var Links = [];
 		var BtnLinks = [];
-
+		//pushing links to the navigation based on who is logged in
 		if (!currentUser) {
 			Links.push(this.createNavLink('login', 'Login'));
 		} else {
 
-			// for loop over students, the push to Links get first name
+			//mapping over students, the push to Links get first name
 			this.state.allStudents.map(function (a) {
 				BtnLinks.push(React.createElement(
 					'li',
 					{ key: a.id },
 					React.createElement(
-						'button',
-						{ className: 'navBtn' },
-						React.createElement(
-							'a',
-							{ href: '#pointBoard/' + a.id },
-							a.get('firstName'),
-							's Board'
-						)
+						'a',
+						{ href: '#pointBoard/' + a.id },
+						a.get('firstName'),
+						's Board'
 					)
 				));
 			});
@@ -34545,13 +34579,9 @@ module.exports = React.createClass({
 				'li',
 				{ key: 'logout' },
 				React.createElement(
-					'button',
-					{ className: 'logoutBtn' },
-					React.createElement(
-						'a',
-						{ href: '#', onClick: this.onLogout },
-						'Logout'
-					)
+					'a',
+					{ href: '#', onClick: this.onLogout },
+					'Logout'
 				)
 			));
 		}
@@ -34570,7 +34600,7 @@ module.exports = React.createClass({
 						{ className: 'navbar-header' },
 						React.createElement(
 							'button',
-							{ type: 'button', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#bs-example-navbar-collapse-1', 'aria-expanded': 'false' },
+							{ type: 'button', id: 'navCollapse', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#bs-example-navbar-collapse-1', 'aria-expanded': 'false' },
 							React.createElement(
 								'span',
 								{ className: 'sr-only' },
@@ -34600,6 +34630,7 @@ module.exports = React.createClass({
 			)
 		);
 	},
+	//when logout is clicked, routing the user to register page.
 	onLogout: function onLogout(e) {
 		e.preventDefault();
 		Parse.User.logOut();
@@ -34642,7 +34673,7 @@ module.exports = React.createClass({
 
 });
 
-},{"../models/StudentModel":183,"backbone":1,"react":173,"react-dom":18}],179:[function(require,module,exports){
+},{"../models/StudentModel":184,"backbone":1,"react":173,"react-dom":18}],179:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34651,6 +34682,7 @@ var Backbone = require('backbone');
 var _ = require('backbone/node_modules/underscore');
 var StudentModel = require('../models/StudentModel');
 var ClassBoxComponent = require('./ClassBoxComponent');
+var RedeemBoxComponent = require('./RedeemBoxComponent');
 
 module.exports = React.createClass({
 	displayName: 'exports',
@@ -34663,6 +34695,7 @@ module.exports = React.createClass({
 	componentWillMount: function componentWillMount() {
 		var _this = this;
 
+		//once new grade is added, dispatcher will update the grade automatically without a refresh
 		this.dispatcher = {};
 		_.extend(this.dispatcher, Backbone.Events);
 		this.dispatcher.on('assignmentSubmit', function () {
@@ -34674,6 +34707,7 @@ module.exports = React.createClass({
 		this.fetchBoard();
 	},
 	render: function render() {
+		//checking to make sure the student and subject has loaded.
 		if (!this.state.student) {
 			return React.createElement(
 				'div',
@@ -34681,6 +34715,7 @@ module.exports = React.createClass({
 				'Loading..'
 			);
 		} else {
+			//passing through information about the student and subject to the classboxcomponent.
 			console.log(this.state.student);
 			return React.createElement(
 				'div',
@@ -34696,7 +34731,7 @@ module.exports = React.createClass({
 					),
 					React.createElement(
 						'h3',
-						{ className: 'col-md-4' },
+						{ className: 'col-md-3 col-md-offset-1' },
 						React.createElement(
 							'span',
 							{ className: 'currentPts' },
@@ -34707,11 +34742,23 @@ module.exports = React.createClass({
 				),
 				React.createElement(
 					'div',
-					{ className: 'row col-md-8', id: 'subjectBoxes' },
-					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Math' }),
-					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Science' }),
-					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Reading' }),
-					React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Social Studies' })
+					null,
+					React.createElement(
+						'div',
+						{ className: 'row col-md-8', id: 'subjectBoxes' },
+						React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Math' }),
+						React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Science' }),
+						React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Reading' }),
+						React.createElement(ClassBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, subject: 'Social Studies' })
+					),
+					React.createElement(
+						'div',
+						{ className: 'col-md-3 col-md-offset-1', id: 'redeemHolder' },
+						React.createElement(RedeemBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, points: '40', prize: 'afternoon activity' }),
+						React.createElement(RedeemBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, points: '60', prize: 'favorite dinner' }),
+						React.createElement(RedeemBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, points: '80', prize: 'movie night' }),
+						React.createElement(RedeemBoxComponent, { dispatcher: this.dispatcher, student: this.state.student, points: '100', prize: 'yogurt trip' })
+					)
 				)
 			);
 		}
@@ -34719,6 +34766,7 @@ module.exports = React.createClass({
 	fetchBoard: function fetchBoard() {
 		var _this2 = this;
 
+		//setting the state for the student
 		var query = new Parse.Query(StudentModel);
 		query.get(this.props.studentId).then(function (student) {
 			console.log('got student', student);
@@ -34730,7 +34778,7 @@ module.exports = React.createClass({
 
 });
 
-},{"../models/StudentModel":183,"./ClassBoxComponent":175,"backbone":1,"backbone/node_modules/underscore":2,"react":173,"react-dom":18}],180:[function(require,module,exports){
+},{"../models/StudentModel":184,"./ClassBoxComponent":175,"./RedeemBoxComponent":180,"backbone":1,"backbone/node_modules/underscore":2,"react":173,"react-dom":18}],180:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -34743,18 +34791,157 @@ module.exports = React.createClass({
 	render: function render() {
 		return React.createElement(
 			'div',
-			null,
+			{ className: 'redeemBox' },
 			React.createElement(
-				'h1',
-				null,
-				'Register'
+				'div',
+				{ className: 'thumbnail' },
+				React.createElement(
+					'div',
+					{ className: 'caption' },
+					React.createElement(
+						'div',
+						null,
+						this.props.points
+					),
+					React.createElement(
+						'div',
+						null,
+						this.props.prize
+					),
+					React.createElement(
+						'button',
+						{ onClick: this.onRedeem },
+						'Redeem Points'
+					)
+				)
 			)
 		);
+	},
+	onRedeem: function onRedeem() {
+		// console.log(this.props.student.get('points'));
+		var totalPoints = this.props.student.get('points') - this.props.points;
+		this.props.student.save({ points: totalPoints });
+		this.props.dispatcher.trigger('assignmentSubmit');
 	}
 
 });
 
 },{"backbone":1,"react":173,"react-dom":18}],181:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Backbone = require('backbone');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	getInitialState: function getInitialState() {
+		return { error: null };
+	},
+	render: function render() {
+		var errorElement = null;
+		if (this.state.error) {
+			errorElement = React.createElement(
+				'p',
+				{ className: 'red' },
+				this.state.error
+			);
+		}
+		return React.createElement(
+			'div',
+			{ className: 'container' },
+			React.createElement(
+				'div',
+				{ className: 'row' },
+				React.createElement(
+					'form',
+					{ className: 'col s12', onSubmit: this.onRegister },
+					React.createElement(
+						'h1',
+						null,
+						'Register'
+					),
+					errorElement,
+					React.createElement(
+						'div',
+						{ className: 'form-group' },
+						React.createElement(
+							'label',
+							{ htmlFor: 'inputEmail3', className: 'col-sm-2 control-label' },
+							'UserName'
+						),
+						React.createElement(
+							'div',
+							{ className: 'col-sm-10' },
+							React.createElement('input', { type: 'text', ref: 'username', className: 'form-control', id: 'inputEmail3' })
+						)
+					),
+					React.createElement(
+						'div',
+						{ className: 'form-group' },
+						React.createElement(
+							'label',
+							{ htmlFor: 'inputEmail3', className: 'col-sm-2 control-label' },
+							'Email'
+						),
+						React.createElement(
+							'div',
+							{ className: 'col-sm-10' },
+							React.createElement('input', { type: 'text', ref: 'email', className: 'form-control', id: 'inputEmail3' })
+						)
+					),
+					React.createElement(
+						'div',
+						{ className: 'form-group' },
+						React.createElement(
+							'label',
+							{ htmlFor: 'inputPassword3', className: 'col-sm-2 control-label' },
+							'Password'
+						),
+						React.createElement(
+							'div',
+							{ className: 'col-sm-10' },
+							React.createElement('input', { type: 'password', ref: 'password', className: 'form-control', id: 'inputPassword3' })
+						)
+					),
+					React.createElement(
+						'div',
+						{ className: 'row' },
+						React.createElement(
+							'button',
+							null,
+							'Register'
+						)
+					)
+				)
+			)
+		);
+	},
+	onRegister: function onRegister(e) {
+		var _this = this;
+
+		e.preventDefault();
+		var user = new Parse.User();
+		user.signUp({
+			username: this.refs.username.value,
+			password: this.refs.password.value,
+			email: this.refs.email.value
+		}, {
+			success: function success(u) {
+				_this.props.router.navigate('', { trigger: true });
+				console.log('it worked!');
+			},
+			error: function error(u, _error) {
+				_this.setState({
+					error: _error.message
+				});
+			}
+		});
+	}
+});
+
+},{"backbone":1,"react":173,"react-dom":18}],182:[function(require,module,exports){
 'use strict';
 var React = require('react');
 var ReactDOM = require('react-dom');
@@ -34807,21 +34994,21 @@ Backbone.history.start();
 
 ReactDOM.render(React.createElement(NavigationComponent, { router: r }), document.getElementById('nav'));
 
-},{"./components/AssignmentDetailComponent":174,"./components/HomeComponent":176,"./components/LoginComponent":177,"./components/NavigationComponent":178,"./components/PointBoardComponent":179,"./components/RegisterComponent":180,"backbone":1,"bootstrap":3,"jquery":17,"react":173,"react-dom":18}],182:[function(require,module,exports){
+},{"./components/AssignmentDetailComponent":174,"./components/HomeComponent":176,"./components/LoginComponent":177,"./components/NavigationComponent":178,"./components/PointBoardComponent":179,"./components/RegisterComponent":181,"backbone":1,"bootstrap":3,"jquery":17,"react":173,"react-dom":18}],183:[function(require,module,exports){
 'use strict';
 
 module.exports = Parse.Object.extend({
 	className: 'AssignmentModel'
 });
 
-},{}],183:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 'use strict';
 
 module.exports = Parse.Object.extend({
 	className: 'StudentModel'
 });
 
-},{}]},{},[181])
+},{}]},{},[182])
 
 
 //# sourceMappingURL=bundle.js.map

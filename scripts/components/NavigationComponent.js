@@ -4,12 +4,14 @@ var Backbone = require('backbone');
 var StudentModel = require('../models/StudentModel');
 
 
+
 module.exports = React.createClass({
 	getInitialState: function(){
 		return{
 			allStudents: []
 		}
 	},
+	//on load, fetching the students from parse and forcing the nav to update with that info.
 	componentWillMount: function() {
 		this.fetchStudents();
 		this.props.router.on('route', () => {
@@ -18,6 +20,7 @@ module.exports = React.createClass({
 
 		this.props.router.on('login', () => {
 			this.fetchStudents();
+			console.log('test')
 			
 		});
 			
@@ -27,28 +30,27 @@ module.exports = React.createClass({
 		var currentUser = Parse.User.current();
 		var Links = [];
 		var BtnLinks = [];
-
+	//pushing links to the navigation based on who is logged in
 		if(!currentUser){
 			Links.push(this.createNavLink('login', 'Login'));
 		}
 		else {
 
-			// for loop over students, the push to Links get first name
+	//mapping over students, the push to Links get first name
 				this.state.allStudents.map((a) => {
-					BtnLinks.push(<li key={a.id}><button className="navBtn"><a href={'#pointBoard/'+a.id}>{a.get('firstName')}s Board</a></button></li>);
+					BtnLinks.push(<li key={a.id}><a href={'#pointBoard/'+a.id}>{a.get('firstName')}s Board</a></li>);
 
 				})
 			
-			Links.push(<li key={'logout'}><button className="logoutBtn"><a href='#' onClick={this.onLogout}>Logout</a></button></li>);
+			Links.push(<li key={'logout'}><a href='#' onClick={this.onLogout}>Logout</a></li>);
 		}
 
 		return (
 			<div>
 				<nav className="navbar navbar-default">
 					<div className="container-fluid">
-
 						<div className="navbar-header">
-							<button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+							<button type="button" id="navCollapse" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
 								<span className="sr-only">Toggle navigation</span>
 								<span className="icon-bar"></span>
 								<span className="icon-bar"></span>
@@ -69,6 +71,7 @@ module.exports = React.createClass({
 			</div>
 		);
 	},
+	//when logout is clicked, routing the user to register page. 
 	onLogout: function(e) {
 		e.preventDefault();
 		Parse.User.logOut();
@@ -84,7 +87,7 @@ module.exports = React.createClass({
 		}
 	},
 	fetchStudents: function(){
-		//finding the children assoicated with the logged in parent
+	//finding the children assoicated with the logged in parent
 			var query = new Parse.Query(StudentModel);
 			query.equalTo('parent', Parse.User.current());
 			query.find().then(

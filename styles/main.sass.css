@@ -18,7 +18,35 @@
   box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2); }
 
 body {
-  font-family: "Lato" !important; }
+  font-family: "Lato" !important;
+  background-color: #A7E3ED !important; }
+
+nav {
+  background-color: #008D9F; }
+  nav .navbar {
+    border-radius: 0; }
+  nav .navbar-default {
+    background-color: #008D9F; }
+    nav .navbar-default .navbar-collapse {
+      border: none; }
+    nav .navbar-default .navbar-nav li > a {
+      color: #fff;
+      text-align: right; }
+    nav .navbar-default .navbar-brand {
+      color: #fff;
+      box-sizing: border-box; }
+
+#navCollapse {
+  background-color: #FB6124;
+  padding: 6px 5px;
+  border-color: #008D9F; }
+  #navCollapse:hover {
+    background-color: #FB6124; }
+  #navCollapse .icon-bar {
+    background-color: #fff;
+    width: 25px;
+    height: 4px;
+    border-radius: 2px; }
 
 .formBlock {
   padding: 3em; }
@@ -29,6 +57,11 @@ body {
 #subjectBoxes {
   margin-top: 2em; }
 
+#redeemHolder {
+  margin-top: 2em;
+  border: 1px solid black;
+  padding: 1em 4em; }
+
 #dropdown {
   margin-right: 0;
   margin-left: 0;
@@ -36,7 +69,7 @@ body {
 
 .currentPts {
   border: 1px solid black;
-  padding: 1em 4em; }
+  padding: 1em; }
 
 .modal-content {
   padding: 3em; }
