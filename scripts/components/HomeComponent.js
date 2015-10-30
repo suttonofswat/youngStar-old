@@ -8,6 +8,7 @@ module.exports = React.createClass({
 		return (
 			<div>
 				<h1>Home</h1>
+				<img className="booksImg" src="../images/books.png"></img>
 				<form onSubmit={this.onAddChild}>
 						<div className="form-group">
 							<label className="col-sm-2 control-label">Childs First Name:</label>

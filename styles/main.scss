@@ -26,6 +26,11 @@ body{
 	background-color: #A7E3ED!important;
 
 }
+a{
+	color: #fff!important;
+
+}
+
 nav{
 
   	background-color: $navColor;
@@ -37,10 +42,13 @@ nav{
 		.navbar-collapse{
 			border: none;
 		}
-			.navbar-nav{
-				li>a{
-					color:#fff;
-					text-align:right;
+			ul{
+				margin: 7.5px -15px;
+				list-style:none;
+				li{
+					    padding-top: 10px;
+    					padding-bottom: 10px;
+    					line-height: 20px;
 				}
 			}
 		
@@ -66,40 +74,112 @@ nav{
 					}
 	}
 
-	
-.formBlock{
-	padding: 3em;
-}
+@media screen and (min-width:768px){
+	nav{
 
-.form-control{
-	margin-bottom: 1em;
+  	background-color: $navColor;
+	.navbar{
+		border-radius: 0;
+	}
+	.navbar-default{
+		background-color: $navColor;
+		.navbar-collapse{
+			border: none;
+		}
+			ul{
+				margin: 0;
+
+				li{
+						float:right;
+						width:20%;
+						height:70px;
+						background:$navColor;
+						text-align:center;
+						-webkit-transition-duration: 50ms;
+						padding-top: 0px;
+			    		padding-bottom: 0px;
+			    		line-height: 0px;
+			    		transition: -webkit-transform 0.2s;
+				}
+			}
+		
+			.navbar-brand{
+				color: #fff;
+            	box-sizing: border-box;
+            	float:left
+			}
+	}
 }
-#subjectBoxes{
-	margin-top: 2em;
-}
-#redeemHolder{
-	margin-top: 2em;
-	border: 1px solid black;
-    padding: 1em 4em;
-}
-#dropdown{
-		margin-right: 0;
-		margin-left: 0;
-		margin-bottom: 0;
-}
-.currentPts{
-	border: 1px solid black;
-	padding: 1em;
-}
-.modal-content{
-	padding: 3em;
-}
-textarea{
-	width: 100%;
-}
-// .classBlock{
-// 	border: 1px solid white;
-// 	padding: 3em;
-// 	box-sizing: border-box;
-// 	background-color: red;
-// }
+		// nav li {
+		// 	display:inline-block;
+		// 	float:right;
+		// 	width:20%;
+		// 	height:70px;
+		// 	background:$navColor;
+		// 	text-align:center;
+		// 	-webkit-transition-duration: 50ms;
+		// 	padding-top: 0px;
+  //   		padding-bottom: 0px;
+  //   		line-height: 0px;
+  //   		transition: -webkit-transform 0.2s;
+		// }
+		
+		a {
+			text-decoration:none;
+			display:block;
+			width:100%;
+			height:100%;
+			padding:25px 0px;
+			text-wrap:none;
+			color: #fff;
+		}
+
+		nav li:hover {
+			background:$navColor;
+			color: #FFF;
+			-webkit-transform: scale(1.1) translate(0px,5px);
+			-webkit-box-shadow: 0px 3px 6px rgba(0,0,0,.3);
+			-webkit-backface-visibility: hidden;
+			a{
+				text-decoration: none;
+				font-size: 1.2em;
+			}
+		}
+		// nav li:active {
+		// 	-webkit-transform: scale(1.05) translate(0px,3px);
+		// 	-webkit-box-shadow: 0px 2px 3px rgba(0,0,0,.3);
+		// 	text-decoration: none;
+		// }
+		.formBlock{
+			padding: 3em;
+		}
+
+		.form-control{
+			margin-bottom: 1em;
+		}
+		#subjectBoxes{
+			margin-top: 2em;
+		}
+		#redeemHolder{
+			margin-top: 2em;
+			border: 1px solid black;
+			padding: 1em 4em;
+		}
+		#dropdown{
+			margin-right: 0;
+			margin-left: 0;
+			margin-bottom: 0;
+		}
+		.currentPts{
+			border: 1px solid black;
+			padding: 1em;
+		}
+		.modal-content{
+			padding: 3em;
+		}
+		textarea{
+			width: 100%;
+		}
+	
+}	
+

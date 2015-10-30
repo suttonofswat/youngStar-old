@@ -46,8 +46,7 @@ module.exports = React.createClass({
 		}
 
 		return (
-			<div>
-				<nav className="navbar navbar-default">
+			<nav className="navbar navbar-default">
 					<div className="container-fluid">
 						<div className="navbar-header">
 							<button type="button" id="navCollapse" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -56,19 +55,18 @@ module.exports = React.createClass({
 								<span className="icon-bar"></span>
 								<span className="icon-bar"></span>
 							</button>
-							<a className="navbar-brand" href="#">youngStar</a>
+							<a className="navbar-brand col-md-4" href="#">youngStar</a>
 						</div>
 
 
 						<div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-							<ul className="nav navbar-nav navbar-right">
-								{BtnLinks}
+							<ul>
 								{Links}
+								{BtnLinks}
 							</ul>
 						</div>
 					</div>
 				</nav>
-			</div>
 		);
 	},
 	//when logout is clicked, routing the user to register page. 

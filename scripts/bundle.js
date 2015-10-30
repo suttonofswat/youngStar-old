@@ -34389,6 +34389,7 @@ module.exports = React.createClass({
 				null,
 				'Home'
 			),
+			React.createElement('img', { className: 'booksImg', src: '../images/books.png' }),
 			React.createElement(
 				'form',
 				{ onSubmit: this.onAddChild },
@@ -34587,44 +34588,40 @@ module.exports = React.createClass({
 		}
 
 		return React.createElement(
-			'div',
-			null,
+			'nav',
+			{ className: 'navbar navbar-default' },
 			React.createElement(
-				'nav',
-				{ className: 'navbar navbar-default' },
+				'div',
+				{ className: 'container-fluid' },
 				React.createElement(
 					'div',
-					{ className: 'container-fluid' },
+					{ className: 'navbar-header' },
 					React.createElement(
-						'div',
-						{ className: 'navbar-header' },
+						'button',
+						{ type: 'button', id: 'navCollapse', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#bs-example-navbar-collapse-1', 'aria-expanded': 'false' },
 						React.createElement(
-							'button',
-							{ type: 'button', id: 'navCollapse', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#bs-example-navbar-collapse-1', 'aria-expanded': 'false' },
-							React.createElement(
-								'span',
-								{ className: 'sr-only' },
-								'Toggle navigation'
-							),
-							React.createElement('span', { className: 'icon-bar' }),
-							React.createElement('span', { className: 'icon-bar' }),
-							React.createElement('span', { className: 'icon-bar' })
+							'span',
+							{ className: 'sr-only' },
+							'Toggle navigation'
 						),
-						React.createElement(
-							'a',
-							{ className: 'navbar-brand', href: '#' },
-							'youngStar'
-						)
+						React.createElement('span', { className: 'icon-bar' }),
+						React.createElement('span', { className: 'icon-bar' }),
+						React.createElement('span', { className: 'icon-bar' })
 					),
 					React.createElement(
-						'div',
-						{ className: 'collapse navbar-collapse', id: 'bs-example-navbar-collapse-1' },
-						React.createElement(
-							'ul',
-							{ className: 'nav navbar-nav navbar-right' },
-							BtnLinks,
-							Links
-						)
+						'a',
+						{ className: 'navbar-brand col-md-4', href: '#' },
+						'youngStar'
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'collapse navbar-collapse', id: 'bs-example-navbar-collapse-1' },
+					React.createElement(
+						'ul',
+						null,
+						Links,
+						BtnLinks
 					)
 				)
 			)
